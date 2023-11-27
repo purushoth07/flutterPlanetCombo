@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:planetcombo/common/widgets.dart';
+import 'package:planetcombo/controllers/applicationbase_controller.dart';
 import 'package:planetcombo/screens/dashboard.dart';
 import 'package:planetcombo/controllers/localization_controller.dart';
 import 'package:get/get.dart';
@@ -18,6 +19,9 @@ class _BalanceState extends State<Balance> {
 
   final LocalizationController localizationController =
   Get.put(LocalizationController.getInstance(), permanent: true);
+
+  final ApplicationBaseController applicationBaseController =
+  Get.put(ApplicationBaseController.getInstance(), permanent: true);
 
   late PaymentOption _selectedOption;
 
@@ -103,7 +107,7 @@ class _BalanceState extends State<Balance> {
                           children: [
                             commonBoldText(text:  LocalizationController.getInstance().getTranslatedValue("Your Balance"), fontSize: 18, color: Colors.white70),
                             SizedBox(height: 10),
-                            commonBoldText(text: '₹ 10055.5', fontSize: 21, color: Colors.white)
+                            commonBoldText(text: '₹ ${applicationBaseController.userAccountBalance.value}', fontSize: 21, color: Colors.white)
                           ],
                         )
                       ],

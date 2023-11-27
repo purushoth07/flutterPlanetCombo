@@ -18,8 +18,29 @@ class APIEndPoints {
   ///Add offline Money
   static String addOfflineMoney = '${baseUrl}api/Invoice/Pay';
 
+  ///update Message
+  static String updateMessage = '${baseUrl}api/messages/updateMessages';
+
+  ///add Message
+  static String addMessage = '${baseUrl}api/messages/addMessages';
+
+  ///delete Message
+  static String deleteMessages = '${baseUrl}api/messages/deleteMessages?userId=';
+
   ///Get terms and conditions
   static String getTermsAndConditions = '${baseUrl}api/termCondition/TCLinkandCharCharges?userId=';
+
+  ///Get invoice List
+  static String getInvoiceList = '${baseUrl}api/invoice/GetInvoiceLists?userId=';
+
+  ///Get user wallet balance
+  static String getUserWalletBalance = '${baseUrl}api/account/getStatements?userId=';
+
+  ///Get User Messages
+  static String getUserMessages = '${baseUrl}api/messages/getMessages?userId=';
+
+  ///Get User Predictions
+  static String getUserPredictions = '${baseUrl}api/request/getRequests?userId=';
 
   ///Delete horoscopes
   static String deleteHoroscope = '${baseUrl}api/horoscope/deleteHoroscope?userId=';
@@ -39,6 +60,10 @@ class APIEndPoints {
 
   ///update Profile
   static String updateProfile = '${baseUrl}api/profile/updateProfile';
+
+
+  ///Add New Profile
+  static String addProfile = '${baseUrl}api/profile/addProfile';
 
   ///Update horoscopes
   static String updateHoroscope = '${baseUrl}api/horoscope/updateHoroscope';

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:planetcombo/common/widgets.dart';
+import 'package:planetcombo/screens/authentication.dart';
 import 'package:planetcombo/screens/dashboard.dart';
 import 'package:planetcombo/screens/social_login.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -82,14 +83,20 @@ void main() async{
     applicationBaseController.initializeApplication();
     userValue = true;
   }
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   // This widget is the root of your application.
+
+
+  final AppLoadController appLoadController =
+  Get.put(AppLoadController.getInstance(), permanent: true);
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -112,7 +119,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: userValue == true ? const Dashboard() : const SocialLogin(),
+      home: userValue == true ? appLoadController.loggedUserData.value.touchid == 'T' ? const Authentication() : const Dashboard() : const SocialLogin(),
       builder: EasyLoading.init(),
     );
   }

@@ -5,11 +5,17 @@ class Constants {
   String mediumFacebook = "Facebook";
   String mediumYahoo = "Yahoo";
   String mediumApple = "Apple";
+  String tccode = '1004';
+  String touchId = 'F';
 
 
   ///App Default
 
   String currency = 'INR';
+  String country = 'INDIA';
+  String idd = '+91';
+  String lang = 'en';
+
 
 
   ///Promise Request

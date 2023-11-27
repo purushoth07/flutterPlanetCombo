@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,8 +8,14 @@ import 'package:planetcombo/controllers/localization_controller.dart';
 import 'package:planetcombo/controllers/applicationbase_controller.dart';
 import 'package:planetcombo/controllers/appLoad_controller.dart';
 import 'package:planetcombo/controllers/add_horoscope_controller.dart';
+import 'package:planetcombo/models/social_login.dart';
+import 'package:planetcombo/screens/dashboard.dart';
+import 'package:planetcombo/screens/social_login.dart';
+import 'package:planetcombo/screens/policy.dart';
 import 'package:get/get.dart';
 import 'dart:io';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileEdit extends StatefulWidget {
   const ProfileEdit({Key? key}) : super(key: key);
@@ -26,6 +34,10 @@ class _ProfileEditState extends State<ProfileEdit> {
 
   final AppLoadController appLoadController =
   Get.put(AppLoadController.getInstance(), permanent: true);
+
+
+  final ApplicationBaseController applicationBaseController =
+  Get.put(ApplicationBaseController.getInstance(), permanent: true);
 
   TextEditingController username = TextEditingController();
   TextEditingController userEmail = TextEditingController();
@@ -68,10 +80,12 @@ class _ProfileEditState extends State<ProfileEdit> {
     if (kDebugMode) {
       print('the picked image is ${pickedImage!.path}');
     }
-    addHoroscopeController.setEditImageFileListFromFile(pickedImage);
+    addHoroscopeController.setEditProfileImageFileListFromFile(pickedImage);
   }
 
   bool isSwitched = false;
+
+  bool isChecked = false;
   
  currentValue(String value){
     if(value == 'ta'){
@@ -86,10 +100,13 @@ class _ProfileEditState extends State<ProfileEdit> {
   @override
   void initState() {
     // TODO: implement initState
-    addHoroscopeController.editImageFileList = <XFile>[].obs;
-    username.text = appLoadController.loggedUserData.value.username!;
-    userEmail.text = appLoadController.loggedUserData.value.useremail!;
-    billingCurrency.text = appLoadController.loggedUserData.value.ucurrency!;
+    addHoroscopeController.editProfileImageFileList?.clear();
+    if(appLoadController.addNewUser.value == 'No') {
+      print('edit image as empty');
+      username.text = appLoadController.loggedUserData.value.username!;
+      userEmail.text = appLoadController.loggedUserData.value.useremail!;
+      billingCurrency.text = appLoadController.loggedUserData.value.ucurrency!;
+    }
     if(appLoadController.loggedUserData.value.touchid == 'F'){
       isSwitched = false;
     }else{
@@ -102,7 +119,17 @@ class _ProfileEditState extends State<ProfileEdit> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        leading: IconButton(onPressed: () { Navigator.pop(context); }, icon: Icon(Icons.chevron_left_rounded),),
+        leading: IconButton(onPressed: () async {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          } else {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.remove('UserInfo');
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const SocialLogin()),
+            );
+          }
+          }, icon: Icon(Icons.chevron_left_rounded),),
         title: LocalizationController.getInstance().getTranslatedValue("Update Profile"),
         colors: const [Color(0xFFf2b20a), Color(0xFFf34509)], centerTitle: true,
       ),
@@ -111,9 +138,9 @@ class _ProfileEditState extends State<ProfileEdit> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            addHoroscopeController.editImageFileList!.isNotEmpty ?
+            addHoroscopeController.editProfileImageFileList!.isNotEmpty ?
             GestureDetector(
-              onTap: _openImagePicker,
+              onTap: appLoadController.addNewUser.value == 'YES' ? (){} : _openImagePicker,
               child: Container(
                   height:90,
                   width: 90,
@@ -125,7 +152,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                   CircleAvatar(
                     radius: 50,
                     child: ClipOval(
-                      child: Image.file(File(addHoroscopeController.editImageFileList![0].path),
+                      child: Image.file(File(addHoroscopeController.editProfileImageFileList![0].path),
                         width: 95,
                         height: 95,
                         fit: BoxFit.cover,
@@ -249,16 +276,55 @@ class _ProfileEditState extends State<ProfileEdit> {
                         setState(() {
                           isSwitched = false;
                         });
+                        appLoadController.loggedUserData.value.touchid = 'F';
                       }else{
                         setState(() {
                           isSwitched = true;
                         });
+                        appLoadController.loggedUserData.value.touchid = 'T';
                       }
                     },
                   )
                 ],
               ),
             ),
+            appLoadController.addNewUser.value == 'YES' ?
+            Row(
+              children: [
+                Checkbox(
+                  value: isChecked,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked = value ?? false;
+                    });
+                  },
+                  checkColor: Colors.white,
+                  activeColor: Colors.orange,
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isChecked = !isChecked;
+                      });
+                    },
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const TermsConditions()));
+                      },
+                      child: const Text(
+                        'I agree to the terms & conditions',
+                        style: TextStyle(
+                          color: Colors.black,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ) : const SizedBox(height: 0,),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Row(
@@ -267,16 +333,60 @@ class _ProfileEditState extends State<ProfileEdit> {
                   SizedBox(
                     width: 150,
                     child: GradientButton(
-                        title: LocalizationController.getInstance().getTranslatedValue("Cancel"),buttonHeight: 45, textColor: Colors.white, buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], onPressed: (Offset buttonOffset){
-                      Navigator.pop(context);
+                        title: LocalizationController.getInstance().getTranslatedValue("Cancel"),buttonHeight: 45, textColor: Colors.white, buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], onPressed: (Offset buttonOffset) async{
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else {
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        prefs.remove('UserInfo');
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => const SocialLogin()),
+                        );
+                      }
                     }),
                   ),
                   SizedBox(width: 20),
                   SizedBox(
                     width: 150,
                     child: GradientButton(
-                        title: LocalizationController.getInstance().getTranslatedValue("Save"),buttonHeight: 45, textColor: Colors.white, buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], onPressed: (Offset buttonOffset){
-addHoroscopeController.updateProfileWithoutImage(context);
+                        title: LocalizationController.getInstance().getTranslatedValue("Save"),buttonHeight: 45, textColor: Colors.white, buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], onPressed: (Offset buttonOffset) async{
+                          if(appLoadController.addNewUser.value == 'YES'){
+                            if(isChecked == true){
+                              print('i reached here');
+                              var response = await addHoroscopeController.addNewProfileWithoutImage(context);
+                              print('add new user response $response');
+                              final prefs = await SharedPreferences.getInstance();
+                              String? jsonString = prefs.getString('UserInfo');
+                              var jsonBody = json.decode(jsonString!);
+                              print('we reached $jsonBody');
+                              appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
+                              print('the data of userId is ${appLoadController.loggedUserData.value.userid}');
+                              applicationBaseController.initializeApplication();
+                              appLoadController.addNewUser.value == 'No';
+                              Navigator.pushReplacement(
+                                  context, MaterialPageRoute(builder: (context) => const Dashboard()));
+                            }else{
+                              showFailedToast('Please read and agree the Terms and conditions');
+                            }
+                          }else{
+                             var response = await addHoroscopeController.updateProfileWithoutImage(context, username.text);
+                              if(response != null){
+                                var responseData = json.decode(response);
+                                SharedPreferences pref = await SharedPreferences.getInstance();
+                                await pref.setString('UserInfo', json.encode(responseData['Data']));
+                                final prefs = await SharedPreferences.getInstance();
+                                String? jsonString = prefs.getString('UserInfo');
+                                print('the setString is $jsonString');
+                                var jsonBody = json.decode(jsonString!);
+                                appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
+                                print('the data of userId is ${appLoadController.loggedUserData.value.username}');
+                                if(responseData['Status'] == 'Success'){
+                                  CustomDialog.showAlert(context, responseData['Message'], true, 14);
+                                }else{
+                                  CustomDialog.showAlert(context, responseData['Message'], false, 14);
+                                }
+                              }
+                          }
                     }),
                   ),
                 ],

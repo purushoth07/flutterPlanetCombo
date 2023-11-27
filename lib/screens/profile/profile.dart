@@ -32,7 +32,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      body: Column(
+      body: Obx(() => Column(
         children: [
           Stack(
             children: [
@@ -71,37 +71,37 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               Positioned(
-                  top: 125,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      height: 100,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.black26,
-                          width: 0.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ],
+                top: 125,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.black26,
+                        width: 0.5,
                       ),
-                      child: CircleAvatar(
-                        radius: 80,
-                        backgroundImage: Image.network(
-                        appLoadController.loggedUserData.value.userphoto!
-                        ).image,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3), // changes position of shadow
                         ),
-                      ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 80,
+                      backgroundImage: Image.network(
+                          appLoadController.loggedUserData.value.userphoto!
+                      ).image,
                     ),
                   ),
+                ),
+              ),
             ],
           ),
           SizedBox(height: 10),
@@ -110,35 +110,35 @@ class _ProfileState extends State<Profile> {
             padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-             children: [
-               commonBoldText(text: LocalizationController.getInstance().getTranslatedValue('Email'), fontSize: 12, color: Colors.black87, textAlign: TextAlign.start),
-               PrimaryStraightInputText(
-                 onValidate: (v) {
-                   return null;
-                 },
-                 fontSize: 12,
-                 hintText: LocalizationController.getInstance().getTranslatedValue('Email'),
-                 controller: profileController.profileEmail,
-                 readOnly: true,
-               ),
-               SizedBox(height: 30),
-               commonBoldText(text: LocalizationController.getInstance().getTranslatedValue('Language'), fontSize: 12, color: Colors.black87, textAlign: TextAlign.start),
-               PrimaryStraightInputText(
-                 onValidate: (v) {
-                   return null;
-                 },
-                 fontSize: 12,
-                 hintText: LocalizationController.getInstance().getTranslatedValue('Language'),
-                 controller: profileController.profileLanguage,
-                 readOnly: true,
-               ),
-             ],
+              children: [
+                commonBoldText(text: LocalizationController.getInstance().getTranslatedValue('Email'), fontSize: 12, color: Colors.black87, textAlign: TextAlign.start),
+                PrimaryStraightInputText(
+                  onValidate: (v) {
+                    return null;
+                  },
+                  fontSize: 12,
+                  hintText: LocalizationController.getInstance().getTranslatedValue('Email'),
+                  controller: profileController.profileEmail,
+                  readOnly: true,
+                ),
+                SizedBox(height: 30),
+                commonBoldText(text: LocalizationController.getInstance().getTranslatedValue('Language'), fontSize: 12, color: Colors.black87, textAlign: TextAlign.start),
+                PrimaryStraightInputText(
+                  onValidate: (v) {
+                    return null;
+                  },
+                  fontSize: 12,
+                  hintText: LocalizationController.getInstance().getTranslatedValue('Language'),
+                  controller: profileController.profileLanguage,
+                  readOnly: true,
+                ),
+              ],
             ),
           ),
           SizedBox(height: 20),
           SizedBox(width: 180, child: GradientButton(buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], title: 'Delete Profile', textColor: Colors.white, onPressed: (Offset buttonOffset){}))
         ],
-      ),
+      )),
     );
   }
 }

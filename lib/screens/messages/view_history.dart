@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:planetcombo/common/widgets.dart';
+import 'package:planetcombo/models/messages_list.dart';
 import 'package:planetcombo/screens/dashboard.dart';
 import 'package:planetcombo/controllers/localization_controller.dart';
 import 'package:get/get.dart';
 
 
 class ViewHistory extends StatefulWidget {
-  const ViewHistory({Key? key}) : super(key: key);
+  MessageHistory messageHistory;
+  ViewHistory({Key? key, required this.messageHistory}) : super(key: key);
 
   @override
   _ViewHistoryState createState() => _ViewHistoryState();
 }
 
 class _ViewHistoryState extends State<ViewHistory> {
+
+  RxList messageComments = [].obs;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    print(widget.messageHistory.msghcomments);
+    List<String> messages = widget.messageHistory.msghcomments!.split('!').where((element) => element.isNotEmpty).toList();
+    messageComments.value = messages;
+    print(messageComments);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,22 +47,22 @@ class _ViewHistoryState extends State<ViewHistory> {
           }, icon: const Icon(Icons.home_outlined))
         ],
       ),
-      body: ListView.builder(
-        itemCount: 4,
+      body: Obx(() => ListView.builder(
+        itemCount: messageComments.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                commonText(text: 'headlettersapi@gmail.com', fontSize: 14),
+                commonText(text: '${messageComments[index].split('^').last}', fontSize: 14),
                 SizedBox(height: 10),
-                commonText(text: '24 juy 2023 : We have the deal', color: Colors.black54, fontSize: 13),
+                commonText(text: '${messageComments[index].split('^')[1]} : ${messageComments[index].split('^').first}', color: Colors.black54, fontSize: 13),
               ],
             ),
           );
         },
-      ),
+      )),
     );
   }
 }

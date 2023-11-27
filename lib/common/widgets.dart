@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:planetcombo/controllers/applicationbase_controller.dart';
 
 // String appMode = 'Light';
 String appMode = 'Dark';

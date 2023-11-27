@@ -16,6 +16,7 @@ import 'package:planetcombo/screens/services/horoscope_services.dart';
 import 'package:planetcombo/screens/social_login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:planetcombo/screens/live_chat.dart';
+import 'package:local_auth/local_auth.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -25,6 +26,9 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+
+  final LocalAuthentication auth = LocalAuthentication();
+
   final double width = 32;
   final double height = 32;
 
@@ -41,7 +45,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:GradientAppBar(
-        leading: GestureDetector(
+        leading: Obx(() => GestureDetector(
           onTap: (){
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => const Profile()));
@@ -53,6 +57,7 @@ class _DashboardState extends State<Dashboard> {
                 imageUrl: appLoadController.loggedUserData.value.userphoto!,
                 width: width,
                 height: height,
+                fit: BoxFit.cover,
                 placeholder: (context, url) => Image.network(
                   'https://img.freepik.com/free-icon/user_318-159711.jpg',
                   width: width,
@@ -66,7 +71,7 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
           ),
-        ),
+        )),
         actions: [
           PopupMenuButton<String>(
             icon: Image.asset(

@@ -15,5 +15,7 @@ class AppLoadController extends GetxController {
   Color appMidColor = const Color(0xfff48100);
 
   Rx<SocialLoginData> loggedUserData = SocialLoginData().obs;
+
+  RxString addNewUser = 'No'.obs;
 }
 

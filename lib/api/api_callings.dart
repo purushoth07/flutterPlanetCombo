@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:planetcombo/api/api_endpoints.dart';
@@ -9,7 +9,7 @@ class APICallings {
 
 
   ///Login Vendor
-  static Future<bool> socialLogin(
+  static Future<String> socialLogin(
       {required String email,required String medium, required String password, required String tokenId}) async {
     Map<String, dynamic> registerObject = {
       "Email": email,
@@ -31,22 +31,32 @@ class APICallings {
       print('the response are crossed');
       print(response.statusCode);
       if(response.statusCode == 403){
-        return false;
+        return 'false';
       }else if(response.statusCode == 200){
         var jsonResponse = json.decode(response.body);
+        print('the json response from social login');
         print(jsonResponse);
+        var string = 'true';
         if(jsonResponse['Status'] == 'Success'){
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('UserInfo', json.encode(jsonResponse['Data']));
+          if(jsonResponse['Message'] == 'No Data found'){
+                string = 'No Data found';
+          }else{
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('UserInfo', json.encode(jsonResponse['Data']));
+              string = 'true';
+          }
+        }else{
+            string = 'false';
         }
-        return true;
+        print(string);
+        return string;
       }else{
-        return false;
+        return 'false';
       }
     }catch(error){
       print('the error reached the catch part');
         print(error);
-        return false;
+        return 'false';
     }
   }
 
@@ -120,6 +130,45 @@ class APICallings {
         return response.body;
       }
     }catch(error){
+      return error;
+    }
+  }
+
+
+  ///Add New Profile
+  static Future addProfile(
+      {required Map<String, dynamic> addProfile}) async {
+    Map<String, dynamic> registerObject = addProfile;
+    var url = Uri.parse(APIEndPoints.addProfile);
+    print('URL : $url');
+    print("Body: ${json.encode(registerObject)}");
+    try{
+      var response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: registerObject
+      );
+      print('the response are crossed');
+      print(response.body);
+      if(response.statusCode == 403){
+        return '403 Error';
+      }else if(response.statusCode == 200){
+        var jsonResponse = json.decode(response.body);
+        print(jsonResponse);
+        if(jsonResponse['Status'] == 'Success'){
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('UserInfo', json.encode(jsonResponse['Data']));
+          return response.body;
+        }else{
+          return jsonResponse['ErrorMessage'];
+        }
+      }else{
+        return response.body;
+      }
+    }catch(error){
+      print(error);
       return 'Server down';
     }
   }
@@ -146,7 +195,9 @@ class APICallings {
       var jsonResponse = json.decode(response.body);
       print(jsonResponse);
       if(jsonResponse['Status'] == 'Success'){
-        return true;
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('UserInfo', json.encode(jsonResponse['Data']));
+        return response.body;
       }else{
         return jsonResponse['ErrorMessage'];
       }
@@ -154,11 +205,6 @@ class APICallings {
       return 'Something went wrong';
     }
   }
-
-
-
-  ///Horoscope Services apis
-
 
   ///get horoscope
   static Future<String?> getHoroscope({required String userId, required String token}) async {
@@ -226,6 +272,48 @@ class APICallings {
     }
   }
 
+  ///get User Messages
+  static Future<String?> getUserMessages({required String userId, required String token}) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "token": token
+      // "Authorization": "Bearer ${currentUserData.value.result!.accessToken}"
+    };
+    var url = Uri.parse(APIEndPoints.getUserMessages+userId);
+    var response = await http.get(
+      url,
+      headers: headers,
+    );
+    print("Terms and conditions Url is: $url");
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return null;
+    }
+  }
+
+  ///get User Predictions
+  static Future<String?> getUserPredictions({required String userId, required String token}) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "token": token
+      // "Authorization": "Bearer ${currentUserData.value.result!.accessToken}"
+    };
+    var url = Uri.parse(APIEndPoints.getUserPredictions+userId);
+    var response = await http.get(
+      url,
+      headers: headers,
+    );
+    print("Terms and conditions Url is: $url");
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return null;
+    }
+  }
+
   ///get terms and Conditions
   static Future<String?> termsAndConditions({required String userId, required String token}) async {
     Map<String, String> headers = {
@@ -235,6 +323,49 @@ class APICallings {
       // "Authorization": "Bearer ${currentUserData.value.result!.accessToken}"
     };
     var url = Uri.parse(APIEndPoints.getTermsAndConditions+userId);
+    var response = await http.get(
+      url,
+      headers: headers,
+    );
+    print("Terms and conditions Url is: $url");
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return null;
+    }
+  }
+
+
+  ///get invoice List
+  static Future<String?> getInvoiceList({required String userId, required String token}) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "token": token
+      // "Authorization": "Bearer ${currentUserData.value.result!.accessToken}"
+    };
+    var url = Uri.parse(APIEndPoints.getInvoiceList+userId);
+    var response = await http.get(
+      url,
+      headers: headers,
+    );
+    print("Terms and conditions Url is: $url");
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return null;
+    }
+  }
+
+  ///get user wallet balance
+  static Future<String?> getWalletBalance({required String userId,required String statementSEQ, required String token}) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "token": token
+      // "Authorization": "Bearer ${currentUserData.value.result!.accessToken}"
+    };
+    var url = Uri.parse('${APIEndPoints.getUserWalletBalance}$userId&StatementSEQ=$statementSEQ');
     var response = await http.get(
       url,
       headers: headers,
@@ -494,6 +625,89 @@ class APICallings {
     return response;
   }
 
+
+  ///Add Message
+  static Future<Response?> addMessage(
+      {required String messageId, required String messageUserId, required String userMessage, required String messageStatus, required String messageRead, required String token}) async {
+    Map<String, dynamic> registerObject = {
+      "MSGCUSTOMERCOM": userMessage,
+      "MSGHID": messageId,
+      "MSGSTATUS": messageStatus,
+      "MSGUNREAD": messageRead,
+      "MSGUSERID": messageUserId,
+    };
+    var url = Uri.parse(APIEndPoints.addMessage);
+
+    print('URL : $url');
+    print("Body: ${json.encode(registerObject)}");
+
+    var response = await http.post(
+      url,
+      body: jsonEncode(registerObject),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "token": token
+      },
+    );
+    var jsonResponse = json.decode(response.body);
+    return response;
+  }
+
+
+
+  ///Update Message
+  static Future<Response?> updateMessage(
+      {required String messageId, required String messageUserId, required String messageMessageId, required String userMessage, required String messageStatus, required String messageRead, required String token}) async {
+    Map<String, dynamic> registerObject = {
+      "MSGHID": messageId,
+      "MSGUSERID": messageUserId,
+      "MSGMESSAGEID":messageMessageId,
+      "MSGCUSTOMERCOM": userMessage,
+      "MSGSTATUS": messageStatus,
+      "MSGUNREAD": messageRead,
+    };
+    var url = Uri.parse(APIEndPoints.updateMessage);
+
+    print('URL : $url');
+    print("Body: ${json.encode(registerObject)}");
+
+    var response = await http.post(
+      url,
+      body: jsonEncode(registerObject),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "token": token
+      },
+    );
+    var jsonResponse = json.decode(response.body);
+    return response;
+  }
+
+  ///Delete Message
+  static Future<Response?> deleteMessage(String messageId, String hid, String userId, String token) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "token": token
+      // "Authorization": "Bearer ${currentUserData.value.result!.accessToken}"
+    };
+    var url = Uri.parse('${APIEndPoints.deleteMessages}$userId&hId=$hid&messageId=$messageId');
+    var response = await http.get(
+      url,
+      headers: headers,
+    );
+    print("Get Delete Message URL : $url");
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      return response;
+    } else {
+      return null;
+    }
+  }
 
   ///add offline Money
   static Future<Response?> addOfflineMoney(

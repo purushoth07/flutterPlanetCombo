@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +20,14 @@ class PaymentController extends GetxController {
 
   void addOfflineMoney(userId, email, amount, token, context) async{
       CustomDialog.showLoading(context, 'Please wait');
-      var response = await APICallings.addOfflineMoney(currency: constants.currency, token: token, amount: amount, email: email, userId: userId);
-      print(response);
+      int money = int.parse(amount);
+      var response = await APICallings.addOfflineMoney(currency: constants.currency, token: token, amount: money, email: email, userId: userId);
+      print(response!.body);
       CustomDialog.cancelLoading(context);
+      var jsonBody = json.decode(response.body);
+      if(jsonBody['Status'] == 'Success'){
+        CustomDialog.showAlert(context, jsonBody['Message'], true, 14);
+      }
   }
 
 }

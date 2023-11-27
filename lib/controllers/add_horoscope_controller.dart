@@ -4,9 +4,13 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:planetcombo/api/api_endpoints.dart';
 import 'package:planetcombo/common/widgets.dart';
 import 'package:planetcombo/controllers/localization_controller.dart';
+import 'package:planetcombo/screens/dashboard.dart';
 import 'package:planetcombo/screens/services/horoscope_services.dart';
+import 'package:planetcombo/models/social_login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_callings.dart';
 import 'package:planetcombo/controllers/appLoad_controller.dart';
 import 'package:planetcombo/controllers/applicationbase_controller.dart';
@@ -99,6 +103,8 @@ class AddHoroscopeController extends GetxController {
   RxList<XFile>? imageFileList = <XFile>[].obs;
   RxList<XFile>? editImageFileList = <XFile>[].obs;
 
+  RxList<XFile>? editProfileImageFileList = <XFile>[].obs;
+
   XFile? image;
 
   void setImageFileListFromFile(XFile? value) {
@@ -108,6 +114,16 @@ class AddHoroscopeController extends GetxController {
 
   void setEditImageFileListFromFile(XFile? value) {
     editImageFileList!.value = (value == null ? null : <XFile>[value])!;
+  }
+
+  void setEditProfileImageFileListFromFile(XFile? value) {
+    editProfileImageFileList!.value = (value == null ? null : <XFile>[value])!;
+  }
+
+  String getCurrentDateTime() {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('ddMMyyHHmmss').format(now);
+    return formattedDate;
   }
 
   editHoroscope(HoroscopesList horoscope){
@@ -403,19 +419,19 @@ class AddHoroscopeController extends GetxController {
     }
   }
 
-  updateProfileWithoutImage(context) async{
-    if(editImageFileList!.isNotEmpty){
-
+  updateProfileWithoutImage(context ,String username) async{
+    if(editProfileImageFileList!.isNotEmpty){
+        updateProfileWithImage(context, username);
     }else{
       Map<String, dynamic> updateProfile = {
           "USERID": appLoadController.loggedUserData.value.userid,
-          "USERNAME": appLoadController.loggedUserData.value.username,
+          "USERNAME": username,
           "USEREMAIL": appLoadController.loggedUserData.value.useremail,
-          "USERIDD":  appLoadController.loggedUserData.value.useridd,
+          "USERIDD":  appLoadController.loggedUserData.value.useridd!.replaceAll(" ", ""),
           "USERMOBILE": appLoadController.loggedUserData.value.usermobile,
           "UCOUNTRY": appLoadController.loggedUserData.value.ucountry,
           "UCURRENCY": appLoadController.loggedUserData.value.ucurrency,
-          "USERPDATE": appLoadController.loggedUserData.value.userpdate,
+          "USERPDATE": getCurrentDateTime(),
           "USERPPLANG": appLoadController.loggedUserData.value.userpplang,
           "TOKENFACEBOOK": appLoadController.loggedUserData.value.tokenfacebook,
           "TOKENGOOGLE": appLoadController.loggedUserData.value.tokengoogle,
@@ -433,6 +449,42 @@ class AddHoroscopeController extends GetxController {
         CustomDialog.showAlert(context, 'Server Down, please try after some time', false, 14);
       }
       print('the received response of add horoscope $response');
+      return response;
+    }
+  }
+
+
+  addNewProfileWithoutImage(context) async{
+    if(editImageFileList!.isNotEmpty){
+
+    }else{
+      Map<String, dynamic> addProfile = {
+        "USERID": appLoadController.loggedUserData.value.userid,
+        "USERNAME": appLoadController.loggedUserData.value.username,
+        "USEREMAIL": appLoadController.loggedUserData.value.useremail,
+        "USERIDD":  appLoadController.loggedUserData.value.useridd,
+        "UCOUNTRY": appLoadController.loggedUserData.value.ucountry,
+        "UCURRENCY": appLoadController.loggedUserData.value.ucurrency,
+        "USERPDATE": appLoadController.loggedUserData.value.userpdate,
+        "USERPPLANG": appLoadController.loggedUserData.value.userpplang,
+        "TOKENGOOGLE": appLoadController.loggedUserData.value.tokengoogle,
+        "USERPHOTO": appLoadController.loggedUserData.value.userphoto,
+        "TOUCHID": appLoadController.loggedUserData.value.touchid,
+        "PASSWORD": appLoadController.loggedUserData.value.password,
+        "TCCODE": appLoadController.loggedUserData.value.tccode,
+        "USERMOBILE": "",
+        "TOKENFACEBOOK": "",
+        "TOKENYAHOO":""
+      };
+      print('the passing value $addProfile');
+      CustomDialog.showLoading(context, 'Please wait');
+      var response = await APICallings.addProfile(addProfile: addProfile);
+      print('add Profile response $response');
+      CustomDialog.cancelLoading(context);
+      if(response == 'Server down'){
+        CustomDialog.showAlert(context, 'Server Down, please try after some time', false, 14);
+      }
+      return response;
     }
   }
 
@@ -545,6 +597,96 @@ class AddHoroscopeController extends GetxController {
     }
   }
 
+  Future<void> updateProfileWithImage(context, username) async{
+    CustomDialog.showLoading(context, 'Please wait');
+    String filename =
+        '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Map<String, String> headers = {
+      'TOKEN': appLoadController.loggedUserData.value.token!,
+    };
+
+    String fileKey = 'USERPHOTO';
+    String url = '';
+    if(appLoadController.addNewUser.value == 'YES'){
+      url = '${APIEndPoints.baseUrl}api/profile/addProfile?fileKey=$fileKey';
+    }else{
+      url = '${APIEndPoints.baseUrl}api/profile/updateProfile?fileKey=$fileKey';
+    }
+
+
+    // Create the multipart request
+    print('the post url is $url');
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    image = XFile(editProfileImageFileList![0].path);
+    // Attach the image file to the request
+    var fileStream = http.ByteStream(image!.openRead());
+    var length = image!.length;
+
+    print('fileStream is $fileStream');
+    print('the file length is ${appLoadController.loggedUserData.value.tokengoogle}');
+
+    // Set the headers and parameters
+    request.headers.addAll(headers);
+    request.fields['USERID'] = appLoadController.loggedUserData.value.userid!;
+    request.fields['USERNAME'] = username;
+    request.fields['USEREMAIL'] = appLoadController.loggedUserData.value.useremail!;
+    request.fields['USERIDD'] =  appLoadController.loggedUserData.value.useridd!.replaceAll(" ", "");
+    request.fields['USERMOBILE'] = appLoadController.loggedUserData.value.usermobile!;
+    request.fields['UCOUNTRY'] = appLoadController.loggedUserData.value.ucountry!;
+    request.fields['UCURRENCY'] = appLoadController.loggedUserData.value.ucurrency!;
+    request.fields['USERPDATE'] = getCurrentDateTime();
+    request.fields['USERPPLANG'] = appLoadController.loggedUserData.value.userpplang!;
+    request.fields['TOKENFACEBOOK'] = appLoadController.loggedUserData.value.tokenfacebook!;
+    request.fields['TOKENGOOGLE'] = appLoadController.loggedUserData.value.tokengoogle!;
+    request.fields['TOKENYAHOO'] = appLoadController.loggedUserData.value.tokenyahoo!;
+    request.fields['TOUCHID'] = appLoadController.loggedUserData.value.touchid!;
+    request.fields['PASSWORD'] = appLoadController.loggedUserData.value.password!;
+    request.fields['TCCODE'] = appLoadController.loggedUserData.value.tccode!;
+
+    print('request sent received ${request.fields}');
+    print('the passing image file is ${image!.path}');
+    var multipartFile =await http.MultipartFile.fromPath('USERPHOTO', image!.path);
+    request.files.add(multipartFile);
+
+    // Send the request and get the response
+    var requestResponse = await request.send();
+
+    print('the passing request response is ${requestResponse.statusCode}');
+
+    requestResponse.stream.transform(utf8.decoder).listen((event) async{
+      var jsonResponse = jsonDecode(event) as Map<String, dynamic>;
+      print('the received profile response is ${jsonResponse['Data']}');
+      if(requestResponse.statusCode == 200){
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        await pref.setString('UserInfo', json.encode(jsonResponse['Data']));
+        CustomDialog.cancelLoading(context);
+        CustomDialog.okActionAlert(context, 'Profile Updated successfully', 'OK', true, 14, () async{
+          CustomDialog.showLoading(context, 'Please wait');
+          final prefs = await SharedPreferences.getInstance();
+          String? jsonString = prefs.getString('UserInfo');
+          var jsonBody = json.decode(jsonString!);
+          appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
+          Future.delayed(Duration(seconds: 2), () {
+            CustomDialog.cancelLoading(context);
+            if(appLoadController.addNewUser.value == 'YES'){
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const Dashboard()),
+                    (Route<dynamic> route) => false,
+              );
+            }else{
+              Navigator.pop(context);
+              Navigator.pop(context);
+            }
+          });
+        });
+      }else{
+        print('the failed response code is ${requestResponse.statusCode}');
+        CustomDialog.cancelLoading(context);
+      }
+    });
+  }
+
   Future<void> uploadImage(context) async {
     // Create a unique filename
     CustomDialog.showLoading(context, 'Please wait');
@@ -561,9 +703,9 @@ class AddHoroscopeController extends GetxController {
     String fileKey = 'hNativePhoto';
     String url = '';
     if(hid.value == ''){
-      url = 'https://dev.planetcombo.com/api/api/horoscope/addNew?fileKey=$fileKey';
+      url = '${APIEndPoints.baseUrl}api/horoscope/addNew?fileKey=$fileKey';
     }else{
-      url = 'https://dev.planetcombo.com/api/api/horoscope/updateHoroscope?fileKey=$fileKey';
+      url = '${APIEndPoints.baseUrl}api/horoscope/updateHoroscope?fileKey=$fileKey';
     }
 
 

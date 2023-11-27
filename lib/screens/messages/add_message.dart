@@ -3,6 +3,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:planetcombo/common/widgets.dart';
 import 'package:planetcombo/screens/dashboard.dart';
 import 'package:planetcombo/controllers/localization_controller.dart';
+import 'package:planetcombo/controllers/applicationbase_controller.dart';
+import 'package:planetcombo/controllers/message_controller.dart';
+import 'package:planetcombo/models/horoscope_list.dart';
 import 'package:get/get.dart';
 
 
@@ -14,6 +17,18 @@ class AddMessages extends StatefulWidget {
 }
 
 class _AddMessagesState extends State<AddMessages> {
+
+  final ApplicationBaseController applicationBaseController =
+  Get.put(ApplicationBaseController.getInstance(), permanent: true);
+
+
+  final MessageController messageController =
+  Get.put(MessageController.getInstance(), permanent: true);
+
+  HoroscopesList? selectedHoroscope;
+
+  TextEditingController userMessage = TextEditingController();
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,13 +56,35 @@ class _AddMessagesState extends State<AddMessages> {
             children: [
               commonBoldText(text: 'Horoscope Name :'),
               SizedBox(height: 20),
-              ReusableBorderDropdown(options: const ['india', 'pakistan'], currentValue: 'india', onChanged: (value){
-                print(value);
-              }),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: DropdownButtonFormField<HoroscopesList>(
+                  value: selectedHoroscope,
+                  items: applicationBaseController.horoscopeList.map((HoroscopesList horoscope) {
+                    return DropdownMenuItem<HoroscopesList>(
+                      value: horoscope,
+                      child: Text(horoscope.hname!),
+                    );
+                  }).toList(),
+                  onChanged: (HoroscopesList? newValue) {
+                    setState(() {
+                      selectedHoroscope = newValue;
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Select horoscope name',
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
               SizedBox(height: 20),
               commonBoldText(text: 'Message'),
               SizedBox(height: 20),
-              PrimaryInputText(hintText: 'Type Your message',maxLines: 6, onValidate: (v){
+              PrimaryInputText(hintText: 'Type Your message',maxLines: 6,controller: userMessage, onValidate: (v){
                 return null;
               }),
               SizedBox(height: 20),
@@ -69,7 +106,19 @@ class _AddMessagesState extends State<AddMessages> {
                   SizedBox(
                     width: 150,
                     child: GradientButton(
-                        title: LocalizationController.getInstance().getTranslatedValue("Send"),buttonHeight: 45, textColor: Colors.white, buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], onPressed: (Offset buttonOffset){
+                        title: LocalizationController.getInstance().getTranslatedValue("Send"),buttonHeight: 45, textColor: Colors.white, buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], onPressed: (Offset buttonOffset) async{
+                          print(selectedHoroscope);
+                          if(selectedHoroscope == null){
+                            showFailedToast('Please select the horoscope');
+                          }else{
+                            if(userMessage.text == ''){
+                              showFailedToast('Please Add your message');
+                            }else{
+                              var response = await messageController.addMessage(context, selectedHoroscope!.hid, selectedHoroscope!.huserid, userMessage.text, '1', "Y");
+                              print('the response of the add message');
+                              print(response);
+                            }
+                          }
                     }),
                   ),
                 ],
