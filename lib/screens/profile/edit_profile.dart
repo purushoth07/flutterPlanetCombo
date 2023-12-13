@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,7 +13,6 @@ import 'package:planetcombo/screens/social_login.dart';
 import 'package:planetcombo/screens/policy.dart';
 import 'package:get/get.dart';
 import 'dart:io';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileEdit extends StatefulWidget {
@@ -101,12 +99,10 @@ class _ProfileEditState extends State<ProfileEdit> {
   void initState() {
     // TODO: implement initState
     addHoroscopeController.editProfileImageFileList?.clear();
-    if(appLoadController.addNewUser.value == 'No') {
       print('edit image as empty');
       username.text = appLoadController.loggedUserData.value.username!;
       userEmail.text = appLoadController.loggedUserData.value.useremail!;
       billingCurrency.text = appLoadController.loggedUserData.value.ucurrency!;
-    }
     if(appLoadController.loggedUserData.value.touchid == 'F'){
       isSwitched = false;
     }else{
@@ -355,16 +351,22 @@ class _ProfileEditState extends State<ProfileEdit> {
                               print('i reached here');
                               var response = await addHoroscopeController.addNewProfileWithoutImage(context);
                               print('add new user response $response');
-                              final prefs = await SharedPreferences.getInstance();
-                              String? jsonString = prefs.getString('UserInfo');
-                              var jsonBody = json.decode(jsonString!);
-                              print('we reached $jsonBody');
-                              appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
-                              print('the data of userId is ${appLoadController.loggedUserData.value.userid}');
-                              applicationBaseController.initializeApplication();
-                              appLoadController.addNewUser.value == 'No';
-                              Navigator.pushReplacement(
-                                  context, MaterialPageRoute(builder: (context) => const Dashboard()));
+                              var string2json = json.decode(response);
+                              print('add new user response ${string2json['Message']}');
+                              if((string2json['Status'] == 'Success' && string2json['Data'] == null)){
+                                CustomDialog.showAlert(context, string2json['Message'] + ' Please contact admin for more info', false, 14);
+                              }else{
+                                final prefs = await SharedPreferences.getInstance();
+                                String? jsonString = prefs.getString('UserInfo');
+                                var jsonBody = json.decode(jsonString!);
+                                print('we reached $jsonBody');
+                                appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
+                                print('the data of userId is ${appLoadController.loggedUserData.value.userid}');
+                                applicationBaseController.initializeApplication();
+                                appLoadController.addNewUser.value == 'No';
+                                Navigator.pushReplacement(
+                                    context, MaterialPageRoute(builder: (context) => const Dashboard()));
+                              }
                             }else{
                               showFailedToast('Please read and agree the Terms and conditions');
                             }

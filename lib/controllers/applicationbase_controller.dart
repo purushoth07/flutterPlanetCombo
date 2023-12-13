@@ -1,13 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planetcombo/controllers/apiCalling_controllers.dart';
 import 'package:planetcombo/controllers/appLoad_controller.dart';
 import 'package:planetcombo/models/horoscope_list.dart';
 import 'package:planetcombo/models/messages_list.dart';
 import 'package:planetcombo/api/api_callings.dart';
-import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 class ApplicationBaseController extends GetxController {
   static ApplicationBaseController? _instance;

@@ -6,7 +6,6 @@ import 'package:planetcombo/screens/dashboard.dart';
 import 'package:planetcombo/controllers/request_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class SpecialPredictions extends StatefulWidget {
   const SpecialPredictions({Key? key}) : super(key: key);

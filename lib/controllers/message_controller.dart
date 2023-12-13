@@ -1,12 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:planetcombo/common/widgets.dart';
 import 'package:planetcombo/api/api_callings.dart';
 import 'package:planetcombo/controllers/appLoad_controller.dart';
 import 'package:planetcombo/controllers/applicationbase_controller.dart';
-import 'package:planetcombo/screens/messages/message_list.dart';
 
 class MessageController extends GetxController {
   static MessageController? _instance;

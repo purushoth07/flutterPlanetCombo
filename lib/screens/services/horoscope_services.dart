@@ -19,7 +19,6 @@ import 'package:planetcombo/controllers/request_controller.dart';
 
 import 'package:planetcombo/screens/Requests/daily_prediction.dart';
 import 'package:planetcombo/screens/Requests/special_prediction.dart';
-import 'package:planetcombo/screens/Requests/daily_prediction.dart';
 
 
 class HoroscopeServices extends StatefulWidget {

@@ -1,8 +1,5 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:planetcombo/common/widgets.dart';
-
 import 'package:planetcombo/api/api_callings.dart';
 
 class ApiCallingsController extends GetxController {

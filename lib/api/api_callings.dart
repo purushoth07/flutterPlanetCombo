@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:planetcombo/api/api_endpoints.dart';
@@ -708,6 +707,32 @@ class APICallings {
       return null;
     }
   }
+
+  ///Delete Profile
+  static Future<Response?> deleteProfile(String userId, String token) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "token": token
+      // "Authorization": "Bearer ${currentUserData.value.result!.accessToken}"
+    };
+    var url = Uri.parse('${APIEndPoints.deleteProfile}$userId');
+    var response = await http.get(
+      url,
+      headers: headers,
+    );
+    print("Get Delete Message URL : $url");
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      return response;
+    } else {
+      return null;
+    }
+  }
+
+
 
   ///add offline Money
   static Future<Response?> addOfflineMoney(

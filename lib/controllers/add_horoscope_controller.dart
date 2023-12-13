@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,9 +14,7 @@ import '../api/api_callings.dart';
 import 'package:planetcombo/controllers/appLoad_controller.dart';
 import 'package:planetcombo/controllers/applicationbase_controller.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-
-import '../models/horoscope_list.dart';
+import 'package:planetcombo/models/horoscope_list.dart';
 
 
 class AddHoroscopeController extends GetxController {

@@ -1,9 +1,5 @@
 import 'dart:convert';
-
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-import 'package:planetcombo/common/common_callings.dart';
 import 'package:planetcombo/common/widgets.dart';
 import 'package:planetcombo/api/api_callings.dart';
 import 'package:planetcombo/common/constant.dart';

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">${applicationName}</string>
+    <string name="facebook_app_id">671204235099169</string>
+    <string name="facebook_client_token">8637c2bcbd22554fa610381439d70e34</string>
+    <!-- Other string resources -->
+</resources>

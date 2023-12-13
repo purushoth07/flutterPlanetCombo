@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
-
 import 'package:planetcombo/models/planet_transit.dart';
 
 class PlanetTransitController extends GetxController {

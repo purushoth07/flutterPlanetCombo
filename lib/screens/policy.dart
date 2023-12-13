@@ -4,7 +4,6 @@ import 'package:planetcombo/controllers/localization_controller.dart';
 import 'package:get/get.dart';
 import 'package:planetcombo/controllers/applicationbase_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:planetcombo/api/api_endpoints.dart';
 
 class TermsConditions extends StatefulWidget {
   const TermsConditions({Key? key}) : super(key: key);

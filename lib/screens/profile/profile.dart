@@ -136,7 +136,11 @@ class _ProfileState extends State<Profile> {
             ),
           ),
           SizedBox(height: 20),
-          SizedBox(width: 180, child: GradientButton(buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], title: 'Delete Profile', textColor: Colors.white, onPressed: (Offset buttonOffset){}))
+          SizedBox(width: 180, child: GradientButton(buttonColors: const [Color(0xFFf2b20a), Color(0xFFf34509)], title: 'Delete Profile', textColor: Colors.white, onPressed: (Offset buttonOffset){
+            yesOrNoDialog(context: context, dialogMessage: 'Are you sure you want to delete your profile?', cancelText: 'NO', okText: 'YES', okAction: (){
+              profileController.deleteProfile(context, appLoadController.loggedUserData.value.userid);
+            });
+          }))
         ],
       )),
     );

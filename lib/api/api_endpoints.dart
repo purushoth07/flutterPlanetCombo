@@ -27,6 +27,9 @@ class APIEndPoints {
   ///delete Message
   static String deleteMessages = '${baseUrl}api/messages/deleteMessages?userId=';
 
+  ///delete Profile
+  static String deleteProfile = '${baseUrl}api/profile/deleteAppUser?userId=';
+
   ///Get terms and conditions
   static String getTermsAndConditions = '${baseUrl}api/termCondition/TCLinkandCharCharges?userId=';
 

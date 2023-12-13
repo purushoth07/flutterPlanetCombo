@@ -12,7 +12,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:planetcombo/controllers/localization_controller.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:planetcombo/test/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'models/social_login.dart';

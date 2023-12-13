@@ -13,7 +13,7 @@ import 'package:planetcombo/controllers/request_controller.dart';
 import 'package:planetcombo/controllers/applicationbase_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 
 class DailyPredictions extends StatefulWidget {
   final HoroscopesList horoscope;

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:planetcombo/common/widgets.dart';
@@ -10,11 +9,12 @@ import 'package:planetcombo/controllers/apiCalling_controllers.dart';
 import 'package:planetcombo/controllers/appLoad_controller.dart';
 import 'package:get/get.dart';
 import 'package:planetcombo/controllers/applicationbase_controller.dart';
+import 'package:planetcombo/controllers/social_login.dart';
+import 'package:planetcombo/screens/authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:planetcombo/models/social_login.dart';
 import 'package:planetcombo/screens/dashboard.dart';
 import 'package:planetcombo/screens/profile/edit_profile.dart';
-import 'package:planetcombo/api/api_callings.dart';
 import 'package:planetcombo/service/local_notification.dart';
 import 'package:intl/intl.dart';
 
@@ -31,6 +31,9 @@ class _SocialLoginState extends State<SocialLogin> {
 
   final ApplicationBaseController applicationBaseController =
   Get.put(ApplicationBaseController.getInstance(), permanent: true);
+
+  final SocialLoginController socialLoginController =
+  Get.put(SocialLoginController.getInstance(), permanent: true);
 
   final ApiCallingsController apiCallingsController =
   Get.put(ApiCallingsController.getInstance(), permanent: true);
@@ -125,8 +128,13 @@ class _SocialLoginState extends State<SocialLogin> {
                               appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
                               print('the data of userId is ${appLoadController.loggedUserData.value.userid}');
                               applicationBaseController.initializeApplication();
-                              Navigator.pushReplacement(
-                                  context, MaterialPageRoute(builder: (context) => const Dashboard()));
+                              if(appLoadController.loggedUserData.value.touchid == 'F'){
+                                Navigator.pushReplacement(
+                                    context, MaterialPageRoute(builder: (context) => const Dashboard()));
+                              }else{
+                                Navigator.pushReplacement(
+                                    context, MaterialPageRoute(builder: (context) => const Authentication()));
+                              }
                             }else if(response == 'false'){
                               CustomDialog.showAlert(context, 'Something went wrong Please try later', false, 16);
                             }else if(response == 'No Data found'){
@@ -151,7 +159,8 @@ class _SocialLoginState extends State<SocialLogin> {
                         }, iconUrl: 'assets/svg/google.svg'),
                   const SizedBox(height: 30),
                   fullLeftIconColorButton(title: 'Login with facebook', textColor: Colors.white,iconColor: Colors.white,  buttonColor: appLoadController.appPrimaryColor, context: context, onPressed: (){
-                    NotificationService.showBigTextNotification(title: "New message title", body: "Your long body", fln: flutterLocalNotificationsPlugin);
+                    socialLoginController.loginWithFacebook();
+                    // NotificationService.showBigTextNotification(title: "New message title", body: "Your long body", fln: flutterLocalNotificationsPlugin);
                   }, iconUrl: 'assets/svg/facebook-logo.svg'),
                   const SizedBox(height: 80),
                 ],

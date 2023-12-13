@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:planetcombo/common/widgets.dart';
 import 'package:planetcombo/models/messages_list.dart';
 import 'package:planetcombo/screens/dashboard.dart';
