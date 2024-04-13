@@ -158,8 +158,8 @@ class _SocialLoginState extends State<SocialLogin> {
                             }
                         }, iconUrl: 'assets/svg/google.svg'),
                   const SizedBox(height: 30),
-                  fullLeftIconColorButton(title: 'Login with facebook', textColor: Colors.white,iconColor: Colors.white,  buttonColor: appLoadController.appPrimaryColor, context: context, onPressed: (){
-                    socialLoginController.loginWithFacebook();
+                  fullLeftIconColorButton(title: 'Login with facebook', textColor: Colors.white,iconColor: Colors.white,  buttonColor: appLoadController.facebookBlue, context: context, onPressed: (){
+                    socialLoginController.loginWithFacebook(context);
                     // NotificationService.showBigTextNotification(title: "New message title", body: "Your long body", fln: flutterLocalNotificationsPlugin);
                   }, iconUrl: 'assets/svg/facebook-logo.svg'),
                   const SizedBox(height: 80),

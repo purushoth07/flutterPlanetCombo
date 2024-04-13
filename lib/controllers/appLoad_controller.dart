@@ -13,6 +13,7 @@ class AppLoadController extends GetxController {
   Color appPrimaryColor = const Color(0xffed5b30);
   Color appSecondaryColor = const Color(0xfff2b20a);
   Color appMidColor = const Color(0xfff48100);
+  Color facebookBlue = const Color(0xff1178f2);
 
   Rx<SocialLoginData> loggedUserData = SocialLoginData().obs;
 

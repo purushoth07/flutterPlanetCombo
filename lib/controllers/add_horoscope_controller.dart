@@ -294,7 +294,6 @@ class AddHoroscopeController extends GetxController {
     horoscopeBirthTimeAlert.value= false;
     horoscopeBirthStateAlert.value = false;
     horoscopeBirthLandmarkAlert.value = false;
-
     refreshForm();
   }
 
@@ -485,6 +484,20 @@ class AddHoroscopeController extends GetxController {
     }
   }
 
+  String convertTo12HourFormat(int hour) {
+    if (hour >= 0 && hour <= 23) {
+      if (hour == 0) {
+        return '12';
+      } else if (hour <= 12) {
+        return hour.toString().padLeft(2, '0');
+      } else {
+        return (hour - 12).toString().padLeft(2, '0');
+      }
+    } else {
+      return 'Invalid hour';
+    }
+  }
+  
   addNewHoroscope(context) async{
     if(imageFileList!.isNotEmpty){
       uploadImage(context);
@@ -496,7 +509,7 @@ class AddHoroscopeController extends GetxController {
         "HNATIVEPHOTO": hNativePhoto.value,
         "HGENDER": findGender(),
         "HDOBNATIVE":returnIntDate(addHoroscopeBirthSelectedDate!.value).toString(),
-        "HHOURS":addHoroscopeBirthSelectedTime!.value.hour.toString(),
+        "HHOURS":convertTo12HourFormat(addHoroscopeBirthSelectedTime!.value.hour),
         "HMIN":addHoroscopeBirthSelectedTime!.value.minute.toString(),
         "HSS":"0",
         "HAMPM":addHoroscopeBirthSelectedTime!.value.period == DayPeriod.pm ? "PM": "AM",
@@ -723,7 +736,7 @@ class AddHoroscopeController extends GetxController {
     request.fields["HNAME"]= horoscopeName.text;
     request.fields["HGENDER"]=findGender()!;
     request.fields["HDOBNATIVE"]=returnIntDate(addHoroscopeBirthSelectedDate!.value).toString();
-    request.fields["HHOURS"]=addHoroscopeBirthSelectedTime!.value.hour.toString();
+    request.fields["HHOURS"]= convertTo12HourFormat(addHoroscopeBirthSelectedTime!.value.hour);
     request.fields["HMIN"]=addHoroscopeBirthSelectedTime!.value.minute.toString();
     request.fields["HSS"]="0";
     request.fields["HAMPM"]=addHoroscopeBirthSelectedTime!.value.period == DayPeriod.pm ? "PM": "AM";

@@ -3,6 +3,9 @@ import 'package:planetcombo/common/widgets.dart';
 import 'package:planetcombo/controllers/localization_controller.dart';
 import 'package:get/get.dart';
 import 'package:planetcombo/screens/dashboard.dart';
+import 'package:planetcombo/controllers/applicationbase_controller.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentHistory extends StatefulWidget {
   const PaymentHistory({Key? key}) : super(key: key);
@@ -13,6 +16,29 @@ class PaymentHistory extends StatefulWidget {
 
 class _PaymentHistoryState extends State<PaymentHistory> {
   late List<bool> _expandedList;
+
+  final ApplicationBaseController applicationBaseController =
+  Get.put(ApplicationBaseController.getInstance(), permanent: true);
+
+  String formatDateTime(String dateTimeString) {
+    DateTime dateTime = DateTime.parse(dateTimeString);
+    String formattedDate = DateFormat('dd MMM yyyy').format(dateTime);
+    String formattedTime = DateFormat('hh:mm a').format(dateTime);
+
+    String formatted = '$formattedDate at $formattedTime';
+    return formatted;
+  }
+  
+  String paymentStatus(String paymentString){
+    String pay = 'Not Paid';
+    if(paymentString == 'N'){
+      pay = 'Pending';
+    }else{
+      pay = 'Paid';
+    }
+    return pay;
+  }
+
 
 
   @override
@@ -38,8 +64,12 @@ class _PaymentHistoryState extends State<PaymentHistory> {
           }, icon: const Icon(Icons.home_outlined))
         ],
       ),
-      body: ListView.builder(
-        itemCount: 20,
+      body: applicationBaseController.paymentHistory.isEmpty ?
+      Center(
+        child: commonText(text: 'No Records found', color: Colors.grey),
+      ) :
+      Obx(() => ListView.builder(
+        itemCount: applicationBaseController.paymentHistory.length,
         itemBuilder: (BuildContext context, int index) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -57,41 +87,57 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                   ),
                 ],
               ),
-              child: ExpansionTile(
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    commonText(text: 'Invoice date : 12/02/05', color: Colors.grey, fontSize: 13),
-                    SizedBox(height: 7),
-                    commonText(text: 'Requested Amount : & 25', color: Colors.grey, fontSize: 13),
-                    SizedBox(height: 7),
-                    commonText(text: 'Total Invoice Amount : & 31.15', color: Colors.grey, fontSize: 13),
-                    SizedBox(height: 7),
-                    commonText(text: 'Paid Status : & 31.15', color: Colors.grey, fontSize: 13),
-                  ],
-                ),
-                collapsedTextColor: Colors.grey,
-                textColor: Colors.black,
-                collapsedBackgroundColor: Colors.white,
-                backgroundColor: Colors.white,
-                initiallyExpanded: _expandedList[index],
-                children: [
-                  Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at tincidunt ante, ac euismod urna. Nullam in magna sed tellus lacinia scelerisque. Aenean elementum neque ac semper semper. In hac habitasse platea dictumst. Nam posuere mauris at suscipit pellentesque. Curabitur vitae scelerisque odio. Phasellus ac malesuada purus. Sed sit amet massa tortor. Fusce vel enim in lorem luctus gravida et ac leo. Vivamus a metus at odio vulputate tincidunt ut id orci. Etiam vel nunc in ante elementum dignissim. Donec tincidunt, purus vitae pulvinar tempus, ligula sem cursus enim, nec placerat lectus ligula et arcu. Donec lacinia, quam id viverra gravida, est leo cursus neque, id vulputate metus lacus a elit. Maecenas at rutrum metus. Suspendisse eu risus euismod, congue purus a, blandit ex.',
-                    maxLines: _expandedList[index] ? null : 4,
-                    overflow: TextOverflow.ellipsis,
+              child: Theme(
+                data: ThemeData().copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      commonText(text: 'Invoice date : ${formatDateTime(applicationBaseController.paymentHistory[index].invoicedate!)}', color: Colors.grey, fontSize: 13),
+                      SizedBox(height: 7),
+                      commonText(text: 'Requested Amount : \$ ${applicationBaseController.paymentHistory[index].paymentrequest}', color: Colors.grey, fontSize: 13),
+                      SizedBox(height: 7),
+                      commonText(text: 'Total Invoice Amount : \$ ${applicationBaseController.paymentHistory[index].totalinvocieamount}', color: Colors.grey, fontSize: 13),
+                      SizedBox(height: 7),
+                      commonText(
+                          text: 'Paid Status : ${paymentStatus(applicationBaseController.paymentHistory[index].paidstatus!)}',
+                          color: applicationBaseController.paymentHistory[index].paidstatus == 'N' ? Colors.grey : Colors.blueGrey,
+                          fontSize: 13),
+                    ],
                   ),
-                ],
-                onExpansionChanged: (bool expanded) {
-                  setState(() {
-                    _expandedList[index] = expanded;
-                  });
-                },
+                  collapsedBackgroundColor: Colors.white,
+                  backgroundColor: Colors.white,
+                  initiallyExpanded: _expandedList[index],
+                  expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+                  childrenPadding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                  children: [
+                    commonText(text: 'Paypal reference number : ${applicationBaseController.paymentHistory[index].pprefnumber}', color: Colors.grey, fontSize: 13),
+                    SizedBox(height: 7),
+                    commonText(text: 'Taxes : \$ ${applicationBaseController.paymentHistory[index].paidamount}', color: Colors.grey, fontSize: 13),
+                    SizedBox(height: 7),
+                    commonText(text: 'Service Charge : & ${applicationBaseController.paymentHistory[index].paidamount}', color: Colors.grey, fontSize: 13),
+                    SizedBox(height: 7),
+                    commonText(text: 'Paid date :  ${formatDateTime(applicationBaseController.paymentHistory[index].invoicedate!)}', color: Colors.grey, fontSize: 13),
+                    SizedBox(height: 7),
+                    commonText(text: 'Payment link reference number : ', color: Colors.grey, fontSize: 13),
+                    GestureDetector(
+                      onTap: (){
+                        launchUrl(Uri.parse(applicationBaseController.paymentHistory[index].paymentlinkrefnumber!));
+                      },
+                      child: commonText(fontSize: 12, text: '${applicationBaseController.paymentHistory[index].paymentlinkrefnumber}', color: Colors.blue),
+                    )
+                  ],
+                  onExpansionChanged: (bool expanded) {
+                    setState(() {
+                      _expandedList[index] = expanded;
+                    });
+                  },
+                ),
               ),
             ),
           );
         },
-      )
+      ))
     );
   }
 }

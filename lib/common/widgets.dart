@@ -176,18 +176,15 @@ class GradientButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (materialIcon != null)
-              Positioned(
-                left: materialIconSize ?? 16,
-                child: Row(
-                  children: [
-                    const SizedBox(width: 5),
-                    Icon(
-                      materialIcon,
-                      color: iconColor ?? Colors.white,
-                      size: materialIconSize ?? 16,
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  const SizedBox(width: 5),
+                  Icon(
+                    materialIcon,
+                    color: iconColor ?? Colors.white,
+                    size: materialIconSize ?? 16,
+                  ),
+                ],
               ),
             Padding(
               padding: const EdgeInsets.fromLTRB(6, 0, 12, 0),
@@ -713,7 +710,6 @@ class ReusableDropdown extends StatelessWidget {
   }
 }
 
-
 class ReusableBorderDropdown extends StatelessWidget {
   final List<String> options;
   final String currentValue;
@@ -755,8 +751,6 @@ class ReusableBorderDropdown extends StatelessWidget {
     );
   }
 }
-
-
 
 class ReusablePopupButton extends StatelessWidget {
   final List<String> options;

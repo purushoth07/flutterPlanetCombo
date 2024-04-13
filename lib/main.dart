@@ -74,13 +74,16 @@ void main() async{
   final prefs = await SharedPreferences.getInstance();
   String? jsonString = prefs.getString('UserInfo');
   print('the value of user info $jsonString');
-  if(jsonString != null){
-    var jsonBody = json.decode(jsonString!);
-    print('we reached $jsonBody');
-    appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
-    print('the data of userId is ${appLoadController.loggedUserData.value.userid}');
-    applicationBaseController.initializeApplication();
-    userValue = true;
+  if(jsonString != 'null'){
+    if(jsonString != null){
+      print(' aim reaced here ');
+      var jsonBody = json.decode(jsonString!);
+      print('we reached $jsonBody');
+      appLoadController.loggedUserData.value = SocialLoginData.fromJson(jsonBody);
+      print('the data of userId is ${appLoadController.loggedUserData.value.userid}');
+      applicationBaseController.initializeApplication();
+      userValue = true;
+    }
   }
   runApp(MyApp());
 }

@@ -370,7 +370,8 @@ class _ProfileEditState extends State<ProfileEdit> {
                             }else{
                               showFailedToast('Please read and agree the Terms and conditions');
                             }
-                          }else{
+                          }
+                          else{
                              var response = await addHoroscopeController.updateProfileWithoutImage(context, username.text);
                               if(response != null){
                                 var responseData = json.decode(response);

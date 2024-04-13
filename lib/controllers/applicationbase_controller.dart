@@ -5,6 +5,7 @@ import 'package:planetcombo/controllers/appLoad_controller.dart';
 import 'package:planetcombo/models/horoscope_list.dart';
 import 'package:planetcombo/models/messages_list.dart';
 import 'package:planetcombo/api/api_callings.dart';
+import 'package:planetcombo/models/payment_records.dart';
 
 class ApplicationBaseController extends GetxController {
   static ApplicationBaseController? _instance;
@@ -19,6 +20,10 @@ class ApplicationBaseController extends GetxController {
   RxList<MessageHistory> messagesHistory = <MessageHistory>[].obs;
 
   Rx<MessagesList> messagesInfo = MessagesList().obs;
+
+  Rx<PaymentRecords> paymentInfo = PaymentRecords().obs;
+
+  RxList<PaymentHistory> paymentHistory = <PaymentHistory>[].obs;
 
   RxBool horoscopeListPageLoad = false.obs;
 
@@ -174,16 +179,18 @@ class ApplicationBaseController extends GetxController {
   _getInvoiceList() async{
     try{
       var response = await APICallings.getInvoiceList(userId: appLoadController.loggedUserData.value.userid!, token: appLoadController.loggedUserData.value.token!);
-      print('the response is ');
+      print('the response of the invoice list');
       print(response);
       if(response != null){
         var jsonBody = json.decode(response);
         if (jsonBody['Status'] == 'Success') {
-
+          paymentInfo.value = paymentListFromJson(response);
+          paymentHistory.value = paymentInfo.value.data!;
+          print('the recevied value of payment length is ${paymentHistory.length}');
         }
       }
     }catch(error){
-      print('terms and conditions have api reach error');
+      print('payment history have api reach error');
       print(error);
     }
   }
